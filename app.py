@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request
 import yfinance as yf
 import pandas as pd
+from flask_frozen import Freezer 
+import sys
 
 app = Flask(__name__)
 
@@ -74,5 +76,21 @@ def display_table():
 
     return render_template('table_template.html', table_data=table_data)
 
+# if __name__ == '__main__':
+#     app.run(debug=True)
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    freezer = Freezer(app)  # Create a Freezer object
+
+    # If you want to freeze your application, run this command:
+    # python app.py freeze
+
+    # If you want to run the development server, use this command:
+    # python app.py runserver
+
+    # The following block should be used only when freezing the application
+    if len(sys.argv) > 1 and sys.argv[1] == 'freeze':
+        freezer.freeze()  # Freeze the application into static files
+    else:
+        app.run(debug=True)
+
