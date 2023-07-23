@@ -1,18 +1,52 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Stock Data Table</title>
-    <!-- Add Bootstrap CSS for table styling -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Add DataTables CSS -->
-    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+    <title>NSE Market Insights</title>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y42F6Q2CDF"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Y42F6Q2CDF');
+    </script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            /* Set the background image */
+            background-image: url('paper.jpeg');
+            /* Set background size to cover */
+            background-size: cover;
+            /* Set background repeat to no-repeat */
+            background-repeat: no-repeat;
+            /* Set background attachment to fixed */
+            background-attachment: fixed;
+            /* Set body height to 100vh for full screen image */
+            height: 100vh;
+            /* Set margin and padding to 0 to remove any gaps */
+            margin: 0;
+            padding: 0;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container mt-4">
-        <h1>Stock Data Table</h1>
-        <!-- Display the DataFrame as an HTML table -->
+    <div class="container mt-4 text-monospace">
+        <h2>
+            Explore Nifty 50 Stocks:
+            <small class="text-muted">Click on any column to sort the table</small>
+        </h2>
+
         <table class="table table-striped" id="stock-table">
-            <thead>
+            <thead class="thead-light">
                 <tr>
                     <th>Ticker</th>
                     <th>Current Price</th>
@@ -45,7 +79,7 @@
     <!-- Add DataTables JavaScript -->
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Initialize DataTables with pagination disabled
             $('#stock-table').DataTable({
                 "paging": false
@@ -53,4 +87,5 @@
         });
     </script>
 </body>
+
 </html>
