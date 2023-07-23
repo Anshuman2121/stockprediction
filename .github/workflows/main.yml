@@ -1,0 +1,40 @@
+name: Build and Deploy Flask App
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Enable manual trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Freeze Flask app
+      run: |
+        python app.py freeze
+
+    - name: cat index.html
+      run: |
+        cat build/index.html
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add build
+        git commit -m "Update build folder"
+        git push origin main
