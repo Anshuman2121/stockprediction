@@ -1,5 +1,8 @@
+from flask import Flask, render_template, request
 import yfinance as yf
 import pandas as pd
+
+app = Flask(__name__)
 
 def calculate_percentage_difference(current_price, reference_price):
     return ((current_price - reference_price) / reference_price) * 100
@@ -54,9 +57,22 @@ for ticker in tickers:
 df = pd.DataFrame(data_list, columns=['Ticker', 'Current Price', '1Y High % Diff', '2Y High % Diff',
                                       '5Y High % Diff', '1Y Low % Diff', '2Y Low % Diff', '5Y Low % Diff'])
 
-print(df)
 
 if stocks_not_fetched:
     print("\nStocks Not Fetched:")
     for stock in stocks_not_fetched:
         print(stock)
+
+@app.route('/')
+def display_table():
+    # Sort the DataFrame based on the selected column (if provided in the query string)
+    column = request.args.get('sort', default='Ticker', type=str)
+    df_sorted = df.sort_values(by=column)
+
+    # Convert the sorted DataFrame to a list of lists for passing to the template
+    table_data = df_sorted.values.tolist()
+
+    return render_template('table_template.html', table_data=table_data)
+
+if __name__ == '__main__':
+    app.run(debug=True)
