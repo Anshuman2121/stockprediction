@@ -35,6 +35,11 @@ jobs:
       run: |
         mv build/index.html stockprediction_pages/index.html
 
+    - name: Configure Git
+      run: |
+        git config --global user.email "anshuman2121@gmail.com"
+        git config --global user.name "Anshuman2121"
+
     - name: Push changes to stockprediction_pages repository
       env:
         USERNAME: ${{ secrets.USERNAME }}
