@@ -10,7 +10,7 @@ def calculate_percentage_difference(current_price, reference_price):
     return ((current_price - reference_price) / reference_price) * 100
 
 tickers = [
-     'LT.NS', 'ONGC.NS', 'NTPC.NS', 'SBIN.NS', 'TATAMOTORS.NS', 'KOTAKBANK.NS', 'HEROMOTOCO.NS',
+    'LT.NS', 'ONGC.NS', 'NTPC.NS', 'SBIN.NS', 'TATAMOTORS.NS', 'KOTAKBANK.NS', 'HEROMOTOCO.NS',
     'DIVISLAB.NS', 'BPCL.NS', 'ICICIBANK.NS', 'ITC.NS', 'BHARTIARTL.NS', 'APOLLOHOSP.NS',
     'ADANIENT.NS', 'MARUTI.NS', 'CIPLA.NS', 'EICHERMOT.NS', 'BAJFINANCE.NS', 'POWERGRID.NS',
     'BAJAJ-AUTO.NS', 'NESTLEIND.NS', 'TATASTEEL.NS', 'COALINDIA.NS', 'ASIANPAINT.NS',
@@ -42,8 +42,9 @@ for ticker in tickers:
         low_2y_diff = calculate_percentage_difference(last_quote, low_2y)
         low_5y_diff = calculate_percentage_difference(last_quote, low_5y)
 
+        short_name = ticker_yahoo.info['shortName']  # Fetch the short name (company name)
         data_list.append([
-            ticker,
+            short_name,
             f"{int(last_quote):,}",
             f"{high_1y_diff:.2f}",
             f"{high_2y_diff:.2f}",
@@ -56,9 +57,8 @@ for ticker in tickers:
     except Exception as e:
         stocks_not_fetched.append(ticker + ": " + str(e))
 
-df = pd.DataFrame(data_list, columns=['Ticker', 'Current Price', '1Y High % Diff', '2Y High % Diff',
+df = pd.DataFrame(data_list, columns=['Name', 'Current Price', '1Y High % Diff', '2Y High % Diff',
                                       '5Y High % Diff', '1Y Low % Diff', '2Y Low % Diff', '5Y Low % Diff'])
-
 
 if stocks_not_fetched:
     print("\nStocks Not Fetched:")
@@ -68,7 +68,7 @@ if stocks_not_fetched:
 @app.route('/')
 def display_table():
     # Sort the DataFrame based on the selected column (if provided in the query string)
-    column = request.args.get('sort', default='Ticker', type=str)
+    column = request.args.get('sort', default='Name', type=str)
     df_sorted = df.sort_values(by=column)
 
     # Convert the sorted DataFrame to a list of lists for passing to the template
@@ -93,4 +93,3 @@ if __name__ == '__main__':
         freezer.freeze()  # Freeze the application into static files
     else:
         app.run(debug=True)
-
