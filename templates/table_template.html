@@ -41,21 +41,36 @@
 <body>
     <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">Market Insights</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="#">Nifty 50</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/chart">Chart</a>
-            </li>
-          </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Nifty 50</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="chart.html" id="chartLink">Chart</a>
+                </li>
+            </ul>
         </div>
-      </nav>
-      
+    </nav>
+
+    <script>
+        // Get the "Chart" nav-link element
+        const chartLink = document.getElementById('chartLink');
+
+        // Add click event listener to the "Chart" nav-link
+        chartLink.addEventListener('click', function (event) {
+            // Prevent the default behavior of the link
+            event.preventDefault();
+
+            // Use window.location to navigate to chart.html
+            window.location.href = 'chart.html';
+        });
+    </script>
+
     <div class="container mt-4 text-monospace">
         <h2>
             Explore Nifty 50 Stocks:
@@ -96,9 +111,9 @@
     <br><br>
     <footer class="footer mt-auto py-3 bg-light">
         <div style="width: auto; max-width: 680px; padding: 0 15px;">
-                <span class="text-muted"> Copyright @ Anshuman Abhishek - 2023 </span>
+            <span class="text-muted"> Copyright @ Anshuman Abhishek - 2023 </span>
         </div>
-      </footer>
+    </footer>
     <!-- Add jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Add DataTables JavaScript -->
