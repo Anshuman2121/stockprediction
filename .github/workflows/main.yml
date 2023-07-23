@@ -27,26 +27,26 @@ jobs:
       run: |
         python app.py freeze
 
-    - name: Clone stockprediction_pages repository
+    - name: Clone MarketInsights repository
       run: |
-        git clone https://github.com/Anshuman2121/stockprediction_pages.git
+        git clone https://github.com/Anshuman2121/MarketInsights.git
 
-    - name: Copy index.html to stockprediction_pages repository
+    - name: Copy index.html to MarketInsights repository
       run: |
-        mv build/index.html stockprediction_pages/index.html
+        mv build/index.html MarketInsights/index.html
 
     - name: Configure Git
       run: |
         git config --global user.email "anshuman2121@gmail.com"
         git config --global user.name "Anshuman2121"
 
-    - name: Push changes to stockprediction_pages repository
+    - name: Push changes to MarketInsights repository
       env:
         USERNAME: ${{ secrets.USERNAME }}
         TOKEN: ${{ secrets.TOKEN }}
       run: |
-        cd stockprediction_pages
-        git remote set-url origin https://$USERNAME:$TOKEN@github.com/Anshuman2121/stockprediction_pages.git
+        cd MarketInsights
+        git remote set-url origin https://$USERNAME:$TOKEN@github.com/Anshuman2121/MarketInsights.git
         git add index.html
         git commit -m "Update index.html"
         git push origin main
