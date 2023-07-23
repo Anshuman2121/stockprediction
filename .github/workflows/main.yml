@@ -17,7 +17,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.x
+        python-version: 3.11
 
     - name: Install dependencies
       run: |
@@ -27,14 +27,21 @@ jobs:
       run: |
         python app.py freeze
 
-    - name: cat index.html
+    - name: Clone stockprediction_pages repository
       run: |
-        cat build/index.html
+        git clone https://github.com/Anshuman2121/stockprediction_pages.git
 
-    - name: Commit and push changes
+    - name: Copy index.html to stockprediction_pages repository
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add build
-        git commit -m "Update build folder"
+        mv build/index.html stockprediction_pages/index.html
+
+    - name: Push changes to stockprediction_pages repository
+      env:
+        USERNAME: ${{ secrets.USERNAME }}
+        TOKEN: ${{ secrets.TOKEN }}
+      run: |
+        cd stockprediction_pages
+        git remote set-url origin https://$USERNAME:$TOKEN@github.com/Anshuman2121/stockprediction_pages.git
+        git add index.html
+        git commit -m "Update index.html"
         git push origin main
