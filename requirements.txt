@@ -1,0 +1,4 @@
+Flask==2.3.2
+Frozen-Flask==0.18
+pandas==2.0.3
+yfinance==0.2.26
