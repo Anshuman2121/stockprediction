@@ -39,24 +39,15 @@
 </head>
 
 <body>
-    <nav class="navbar sticky-top navbar-expand-sm navbar-light bg-light">
-        <a class="navbar-brand" href="#">Market Insights</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Nifty 50</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="chart.html" id="chartLink">Chart</a>
-                </li>
+    <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light justify-content-between flex-nowrap flex-row">
+        <div class="container">
+            <a href="#" class="navbar-brand float-left">Market Insights </a>
+            <ul class="nav navbar-nav flex-row float-right">
+                <li class="nav-item"><a class="nav-link pr-3" href="/index.html">Nifty 50</a></li>
+                <li class="nav-item"><a class="nav-link" href="/chart.html">Chart</a></li>
             </ul>
         </div>
     </nav>
-
     <script>
         // Get the "Chart" nav-link element
         const chartLink = document.getElementById('chartLink');
