@@ -73,23 +73,32 @@ def get_data_for_endpoints(data):
 nifty50_data = read_csv_and_preprocess("nifty50list.csv")
 nifty50_df, nifty50_stocks_not_fetched = get_data_for_endpoints(nifty50_data)
 
+niftynext50_data = read_csv_and_preprocess("niftynext50list.csv")
+niftynext50_df, niftynext50_stocks_not_fetched = get_data_for_endpoints(niftynext50_data)
+
 nifty100_data = read_csv_and_preprocess("niftymidcap100list.csv")
 nifty100_df, nifty100_stocks_not_fetched = get_data_for_endpoints(nifty100_data)
 
 @app.route('/')
 def display_table():
-    # Sort the DataFrame based on the selected column (if provided in the query string)
-    column = request.args.get('sort', default='Name', type=str)
-
-    if column in nifty50_df.columns:
-        df_sorted = nifty50_df.sort_values(by=column)
-    else:
-        df_sorted = nifty100_df.sort_values(by=column)
-
     # Convert the sorted DataFrame to a list of lists for passing to the template
-    table_data = df_sorted.values.tolist()
+    table_data = niftynext50_df.values.tolist()
 
     return render_template('nifty50.html', table_data=table_data)
+
+@app.route('/niftynext50')
+def display_niftynext50_table():
+    # Convert the DataFrame to a list of lists for passing to the template
+    table_data = niftynext50_df.values.tolist()
+
+    return render_template('niftynext50.html', table_data=table_data)
+
+@app.route('/midcap100')
+def display_nifty100_table():
+    # Convert the DataFrame to a list of lists for passing to the template
+    table_data = nifty100_df.values.tolist()
+
+    return render_template('midcap100.html', table_data=table_data)
 
 @app.route('/chart')
 def display_candlestick_chart():
@@ -154,14 +163,6 @@ def display_candlestick_chart():
     response.headers['Content-Type'] = 'text/html; charset=utf-8'
 
     return response
-
-
-@app.route('/midcap100')
-def display_nifty100_table():
-    # Convert the DataFrame to a list of lists for passing to the template
-    table_data = nifty100_df.values.tolist()
-
-    return render_template('midcap100.html', table_data=table_data)
 
 if __name__ == '__main__':
     freezer = Freezer(app)

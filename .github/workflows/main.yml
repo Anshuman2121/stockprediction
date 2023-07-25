@@ -37,6 +37,7 @@ jobs:
       run: |
         mv build/index.html MarketInsights/index.html
         mv build/midcap100 MarketInsights/midcap100.html
+        mv build/niftynext50 MarketInsights/niftynext50.html
         mv build/chart MarketInsights/chart.html
 
     - name: Configure Git
