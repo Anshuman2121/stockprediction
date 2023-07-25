@@ -52,6 +52,6 @@ jobs:
       run: |
         cd MarketInsights
         git remote set-url origin https://$USERNAME:$TOKEN@github.com/Anshuman2121/MarketInsights.git
-        git add index.html chart.html
+        git add .
         git commit -m "Update index.html"
         git push origin main
