@@ -36,6 +36,7 @@ jobs:
     - name: Copy index.html to MarketInsights repository
       run: |
         mv build/index.html MarketInsights/index.html
+        mv build/midcap100 MarketInsights/midcap100.html
         mv build/chart MarketInsights/chart.html
 
     - name: Configure Git

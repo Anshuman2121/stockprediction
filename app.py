@@ -1,10 +1,10 @@
-from flask import Flask, render_template, request, make_response
+from flask import Flask, render_template, request
 import yfinance as yf
 import pandas as pd
 import plotly.graph_objects as go
 import numpy as np
 from datetime import datetime, timedelta
-from flask_frozen import Freezer 
+from flask_frozen import Freezer
 import sys
 
 app = Flask(__name__)
@@ -12,21 +12,7 @@ app = Flask(__name__)
 def calculate_percentage_difference(current_price, reference_price):
     return ((current_price - reference_price) / reference_price) * 100
 
-tickers = [
-    'LT.NS', 'ONGC.NS', 'NTPC.NS', 'SBIN.NS', 'TATAMOTORS.NS', 'KOTAKBANK.NS', 'HEROMOTOCO.NS',
-    'DIVISLAB.NS', 'BPCL.NS', 'ICICIBANK.NS', 'ITC.NS', 'BHARTIARTL.NS', 'APOLLOHOSP.NS',
-    'ADANIENT.NS', 'MARUTI.NS', 'CIPLA.NS', 'EICHERMOT.NS', 'BAJFINANCE.NS', 'POWERGRID.NS',
-    'BAJAJ-AUTO.NS', 'NESTLEIND.NS', 'TATASTEEL.NS', 'COALINDIA.NS', 'ASIANPAINT.NS',
-    'SUNPHARMA.NS', 'BAJAJFINSV.NS', 'TITAN.NS', 'ADANIPORTS.NS', 'BRITANNIA.NS', 'AXISBANK.NS',
-    'HDFCBANK.NS', 'UPL.NS', 'GRASIM.NS', 'LT.NS', 'DRREDDY.NS', 'INDUSINDBK.NS', 'ULTRACEMCO.NS',
-    'JSWSTEEL.NS', 'SBILIFE.NS', 'M&M.NS', 'HINDALCO.NS', 'HDFCLIFE.NS', 'TECHM.NS', 'TATACONSUM.NS',
-    'RELIANCE.NS', 'TCS.NS', 'WIPRO.NS', 'HCLTECH.NS', 'HINDUNILVR.NS', 'INFY.NS'
-]
-
-data_list = []
-stocks_not_fetched = []
-
-for ticker in tickers:
+def fetch_ticker_data(ticker):
     try:
         ticker_yahoo = yf.Ticker(ticker)
         data = ticker_yahoo.history(period='5y')
@@ -45,9 +31,7 @@ for ticker in tickers:
         low_2y_diff = calculate_percentage_difference(last_quote, low_2y)
         low_5y_diff = calculate_percentage_difference(last_quote, low_5y)
 
-        short_name = ticker_yahoo.info['shortName']  # Fetch the short name (company name)
-        data_list.append([
-            short_name,
+        return [
             f"{int(last_quote):,}",
             f"{high_1y_diff:.2f}",
             f"{high_2y_diff:.2f}",
@@ -55,29 +39,57 @@ for ticker in tickers:
             f"{low_1y_diff:.2f}",
             f"{low_2y_diff:.2f}",
             f"{low_5y_diff:.2f}"
-        ])
+        ]
 
     except Exception as e:
-        stocks_not_fetched.append(ticker + ": " + str(e))
+        return [None, None, None, None, None, None, None]
 
-df = pd.DataFrame(data_list, columns=['Name', 'Current Price', '1Y High % Diff', '2Y High % Diff',
-                                      '5Y High % Diff', '1Y Low % Diff', '2Y Low % Diff', '5Y Low % Diff'])
+def read_csv_and_preprocess(filename):
+    data = pd.read_csv(filename)
+    data['Symbol'] = data['Symbol'] + ".NS"
+    return data
 
-if stocks_not_fetched:
-    print("\nStocks Not Fetched:")
-    for stock in stocks_not_fetched:
-        print(stock)
+def get_data_for_endpoints(data):
+    data_list = []
+    stocks_not_fetched = []
+
+    for index, row in data.iterrows():
+        ticker = row['Symbol']
+        ticker_data = fetch_ticker_data(ticker)
+
+        if all(data_point is not None for data_point in ticker_data):
+            data_list.append([
+                row['Company Name'],
+                row['Industry'],
+                row['Symbol'],
+                *ticker_data
+            ])
+        else:
+            stocks_not_fetched.append(row['Symbol'])
+
+    return pd.DataFrame(data_list, columns=['Name', 'Industry', 'Symbol', 'Current Price', '1Y High % Diff', '2Y High % Diff',
+                                      '5Y High % Diff', '1Y Low % Diff', '2Y Low % Diff', '5Y Low % Diff']), stocks_not_fetched
+
+nifty50_data = read_csv_and_preprocess("nifty50list.csv")
+nifty50_df, nifty50_stocks_not_fetched = get_data_for_endpoints(nifty50_data)
+
+nifty100_data = read_csv_and_preprocess("niftymidcap100list.csv")
+nifty100_df, nifty100_stocks_not_fetched = get_data_for_endpoints(nifty100_data)
 
 @app.route('/')
 def display_table():
     # Sort the DataFrame based on the selected column (if provided in the query string)
     column = request.args.get('sort', default='Name', type=str)
-    df_sorted = df.sort_values(by=column)
+
+    if column in nifty50_df.columns:
+        df_sorted = nifty50_df.sort_values(by=column)
+    else:
+        df_sorted = nifty100_df.sort_values(by=column)
 
     # Convert the sorted DataFrame to a list of lists for passing to the template
     table_data = df_sorted.values.tolist()
 
-    return render_template('table_template.html', table_data=table_data)
+    return render_template('nifty50.html', table_data=table_data)
 
 @app.route('/chart')
 def display_candlestick_chart():
@@ -138,10 +150,18 @@ def display_candlestick_chart():
     )
 
     chart_div = fig.to_html(full_html=False, include_plotlyjs='cdn')
-    response = app.make_response(render_template('candlestick_chart_template.html', chart_div=chart_div))
+    response = app.make_response(render_template('chart.html', chart_div=chart_div))
     response.headers['Content-Type'] = 'text/html; charset=utf-8'
 
     return response
+
+
+@app.route('/midcap100')
+def display_nifty100_table():
+    # Convert the DataFrame to a list of lists for passing to the template
+    table_data = nifty100_df.values.tolist()
+
+    return render_template('midcap100.html', table_data=table_data)
 
 if __name__ == '__main__':
     freezer = Freezer(app)
@@ -150,6 +170,3 @@ if __name__ == '__main__':
         freezer.freeze()
     else:
         app.run(debug=True)
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
