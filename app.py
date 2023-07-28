@@ -82,7 +82,7 @@ nifty100_df, nifty100_stocks_not_fetched = get_data_for_endpoints(nifty100_data)
 @app.route('/')
 def display_table():
     # Convert the sorted DataFrame to a list of lists for passing to the template
-    table_data = niftynext50_df.values.tolist()
+    table_data = nifty50_df.values.tolist()
 
     return render_template('nifty50.html', table_data=table_data)
 
