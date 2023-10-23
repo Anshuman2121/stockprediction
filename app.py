@@ -9,6 +9,12 @@ import sys
 
 app = Flask(__name__)
 
+def custom_strftime(date_object):
+    suffix = 'th' if 11 <= date_object.day <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(date_object.day % 10, 'th')
+    return date_object.strftime(f"%d{suffix} %b, %y")
+
+today_date = custom_strftime(datetime.now())
+
 def calculate_percentage_difference(current_price, reference_price):
     return ((current_price - reference_price) / reference_price) * 100
 
@@ -17,6 +23,9 @@ def fetch_ticker_data(ticker):
         ticker_yahoo = yf.Ticker(ticker)
         data = ticker_yahoo.history(period='5y')
         last_quote = data['Close'].iloc[-1]
+        ma_200 = data['Close'].rolling(window=200).mean().iloc[-1]  # 200-day moving average
+        avg_percentage = calculate_percentage_difference(last_quote, ma_200)
+
         high_1y = data['High'].rolling(window='365D').max().iloc[-1]
         high_2y = data['High'].rolling(window='730D').max().iloc[-1]
         high_5y = data['High'].max()
@@ -33,6 +42,7 @@ def fetch_ticker_data(ticker):
 
         return [
             f"{int(last_quote):,}",
+            f"{avg_percentage:.2f}",
             f"{high_1y_diff:.2f}",
             f"{high_2y_diff:.2f}",
             f"{high_5y_diff:.2f}",
@@ -42,7 +52,7 @@ def fetch_ticker_data(ticker):
         ]
 
     except Exception as e:
-        return [None, None, None, None, None, None, None]
+        return [None, None, None, None, None, None, None, None]
 
 def read_csv_and_preprocess(filename):
     data = pd.read_csv(filename)
@@ -67,8 +77,7 @@ def get_data_for_endpoints(data):
         else:
             stocks_not_fetched.append(row['Symbol'])
 
-    return pd.DataFrame(data_list, columns=['Name', 'Industry', 'Symbol', 'Current Price', '1Y High % Diff', '2Y High % Diff',
-                                      '5Y High % Diff', '1Y Low % Diff', '2Y Low % Diff', '5Y Low % Diff']), stocks_not_fetched
+    return pd.DataFrame(data_list, columns=['Name', 'Industry', 'Symbol', 'Current Price', '200 DMA Avg', '1Y High % Diff', '2Y High % Diff', '5Y High % Diff', '1Y Low % Diff', '2Y Low % Diff', '5Y Low % Diff']), stocks_not_fetched
 
 nifty50_data = read_csv_and_preprocess("nifty50list.csv")
 nifty50_df, nifty50_stocks_not_fetched = get_data_for_endpoints(nifty50_data)
@@ -81,24 +90,21 @@ nifty100_df, nifty100_stocks_not_fetched = get_data_for_endpoints(nifty100_data)
 
 @app.route('/')
 def display_table():
-    # Convert the sorted DataFrame to a list of lists for passing to the template
     table_data = nifty50_df.values.tolist()
 
-    return render_template('nifty50.html', table_data=table_data)
+    return render_template('nifty50.html', table_data=table_data, today_date=today_date)
 
 @app.route('/niftynext50')
 def display_niftynext50_table():
-    # Convert the DataFrame to a list of lists for passing to the template
     table_data = niftynext50_df.values.tolist()
 
-    return render_template('niftynext50.html', table_data=table_data)
+    return render_template('niftynext50.html', table_data=table_data, today_date=today_date)
 
 @app.route('/midcap100')
 def display_nifty100_table():
-    # Convert the DataFrame to a list of lists for passing to the template
     table_data = nifty100_df.values.tolist()
 
-    return render_template('midcap100.html', table_data=table_data)
+    return render_template('midcap100.html', table_data=table_data, today_date=today_date)
 
 @app.route('/chart')
 def display_candlestick_chart():
@@ -150,10 +156,9 @@ def display_candlestick_chart():
     fig.add_trace(go.Scatter(x=df['time'], y=slmax*np.arange(num_trading_days) + intercmax, mode='lines', line=dict(color='blue'), name='Upper Channel Line'))
 
     fig.update_layout(
-        # title="Candlestick Chart for ^NSEI",
         xaxis_title="Date",
         yaxis_title="Price",
-        margin=dict(l=50, r=50, t=50, b=50),  # Adjust margins for better visualization
+        margin=dict(l=50, r=50, t=50, b=50),
         autosize=True, 
         # height=800, 
     )

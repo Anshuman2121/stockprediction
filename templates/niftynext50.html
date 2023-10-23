@@ -35,12 +35,27 @@
             margin: 0;
             padding: 0;
         }
+
+        .navbar-brand {
+            font-size: 3rem; /* Adjust the size as per your preference */
+            font-weight: bold;
+            color: #2a4d69;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 20px;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .float-left {
+            float: left;
+        }
     </style>
 </head>
 
 <body>
     <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light justify-content-between flex-nowrap flex-row">
-        <div class="container">
+
             <a href="#" class="navbar-brand float-left">Market Insights </a>
             <ul class="nav navbar-nav flex-row float-right">
                 <li class="nav-item"><a class="nav-link pr-3" href="index.html">Nifty 50</a></li>
@@ -63,14 +78,15 @@
             window.location.href = 'chart.html';
         });
     </script>
-
-    <div class="container mt-4 text-monospace">
-        <h2>
+    <br>
+    <div class="container-fluid mt-4 text-monospace">
+        <h4>
             Explore Nifty Next 50 Stocks:
             <small class="text-muted">Click on any column to sort the table</small>
-        </h2>
+        </h4>
         <br><br>
-
+        
+        <div class="table-responsive">
         <table class="table table-striped" id="stock-table">
             <thead class="thead-light">
                 <tr>
@@ -78,6 +94,7 @@
                     <th>Industry</th>
                     <th>Symbol</th>
                     <th>Current Price</th>
+                    <th>200 DMA Avg</th>
                     <th>1Y High % Diff</th>
                     <th>2Y High % Diff</th>
                     <th>5Y High % Diff</th>
@@ -97,12 +114,14 @@
                     <td>{{ row[5] }}</td>
                     <td>{{ row[6] }}</td>
                     <td>{{ row[7] }}</td>
-                    <td>{{ row[8] }}</td> <!-- Add 1Y High % Diff here -->
-                    <td>{{ row[9] }}</td> <!-- Add 2Y High % Diff here -->
+                    <td>{{ row[8] }}</td> 
+                    <td>{{ row[9] }}</td> 
+                    <td>{{ row[10] }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
     </div>
     <br><br>
     <br><br>
@@ -110,11 +129,11 @@
 </div>
 </div>
 <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/1066313/t/1"></script>
-<footer class="footer">
-<div class="container">
-  <span class="text-muted"> Copyright @ Anshuman Abhishek - 2021 </span>
-  <span class="text-muted made-with-love" style="float: right;"> Made with ❤️ </span>
-</div>
+<footer class="footer" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;">
+    <span class="text-muted" style="flex: 1; text-align: left;"> Copyright @ Anshuman Abhishek - 2021 </span>
+    <span class="text-muted" style="flex: 1; text-align: center;"> Made with ❤️ </span>
+    <span class="text-muted" style="flex: 1; text-align: right;"> Last Update : {{ today_date }} </span>
+</footer>
     <!-- Add jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Add DataTables JavaScript -->
