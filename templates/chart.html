@@ -36,12 +36,26 @@
             margin: 0;
             padding: 0;
         }
+
+        .navbar-brand {
+            font-size: 3rem; /* Adjust the size as per your preference */
+            font-weight: bold;
+            color: #2a4d69;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 20px;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .float-left {
+            float: left;
+        }
     </style>
 </head>
 
 <body>
     <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light justify-content-between flex-nowrap flex-row">
-        <div class="container">
             <a href="#" class="navbar-brand float-left">Market Insights </a>
             <ul class="nav navbar-nav flex-row float-right">
                 <li class="nav-item"><a class="nav-link pr-3" href="index.html">Nifty 50</a></li>
@@ -49,7 +63,6 @@
                 <li class="nav-item"><a class="nav-link pr-3" href="midcap100.html">Midcap 100</a></li>
                 <li class="nav-item"><a class="nav-link" href="chart.html">Chart</a></li>
             </ul>
-        </div>
     </nav>
     
     <script>
