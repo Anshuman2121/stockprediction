@@ -67,8 +67,8 @@ def get_data_for_endpoints(data):
     nsei_data = fetch_ticker_data("^NSEI")
     if all(data_point is not None for data_point in nsei_data):
         data_list.append([
-            "Nifty 50",
-            "Index",
+            "^Nifty 50",
+            "^Index",
             "^NSEI",
             *nsei_data
         ])
