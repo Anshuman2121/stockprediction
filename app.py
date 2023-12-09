@@ -23,7 +23,7 @@ def fetch_ticker_data(ticker):
         ticker_yahoo = yf.Ticker(ticker)
         data = ticker_yahoo.history(period='5y')
         last_quote = data['Close'].iloc[-1]
-        ma_200 = data['Close'].rolling(window=200).mean().iloc[-1]  # 200-day moving average
+        ma_200 = data['Close'].rolling(window=200).mean().iloc[-1]
         avg_percentage = calculate_percentage_difference(last_quote, ma_200)
 
         high_1y = data['High'].rolling(window='365D').max().iloc[-1]
@@ -63,6 +63,19 @@ def get_data_for_endpoints(data):
     data_list = []
     stocks_not_fetched = []
 
+    # Add ^NSEI index data
+    nsei_data = fetch_ticker_data("^NSEI")
+    if all(data_point is not None for data_point in nsei_data):
+        data_list.append([
+            "Nifty 50",
+            "Index",
+            "^NSEI",
+            *nsei_data
+        ])
+    else:
+        stocks_not_fetched.append("^NSEI")
+
+    # Add individual stock data
     for index, row in data.iterrows():
         ticker = row['Symbol']
         ticker_data = fetch_ticker_data(ticker)
@@ -78,6 +91,7 @@ def get_data_for_endpoints(data):
             stocks_not_fetched.append(row['Symbol'])
 
     return pd.DataFrame(data_list, columns=['Name', 'Industry', 'Symbol', 'Current Price', '200 DMA Avg', '1Y High % Diff', '2Y High % Diff', '5Y High % Diff', '1Y Low % Diff', '2Y Low % Diff', '5Y Low % Diff']), stocks_not_fetched
+
 
 nifty50_data = read_csv_and_preprocess("nifty50list.csv")
 nifty50_df, nifty50_stocks_not_fetched = get_data_for_endpoints(nifty50_data)
