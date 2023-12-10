@@ -41,7 +41,8 @@ jobs:
         mv build/niftynext50 MarketInsights/niftynext50.html
         sed -i '' 's,/static/images/,static/images/,g' build/chart
         mv build/chart MarketInsights/chart.html
-        mv build/static MarketInsights/static
+        rm -rf MarketInsights/static/images/*
+        cp -rf build/static/images/* MarketInsights/static/images/
 
     - name: Configure Git
       run: |
