@@ -1,13 +1,15 @@
 from flask import Flask, render_template, request
 import yfinance as yf
 import pandas as pd
-import plotly.graph_objects as go
+import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime, timedelta
 from flask_frozen import Freezer
 import sys
+import os
 
 app = Flask(__name__)
+df_nifty100 = pd.read_csv('nifty100list.csv')
 
 def custom_strftime(date_object):
     suffix = 'th' if 11 <= date_object.day <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(date_object.day % 10, 'th')
@@ -92,6 +94,84 @@ def get_data_for_endpoints(data):
 
     return pd.DataFrame(data_list, columns=['Name', 'Industry', 'Symbol', 'Current Price', '200 DMA Avg', '1Y High % Diff', '2Y High % Diff', '5Y High % Diff', '1Y Low % Diff', '2Y Low % Diff', '5Y Low % Diff']), stocks_not_fetched
 
+def generate_graph(symbol, index):
+    try:
+        end_date = datetime.now().strftime("%Y-%m-%d")
+        start_date = (datetime.now() - timedelta(days=5 * 365)).strftime("%Y-%m-%d")
+        data = yf.download(symbol, start=start_date, end=end_date)
+        data.reset_index(inplace=True)
+
+        # Create DataFrame
+        df = pd.DataFrame({
+            'time': data['Date'],
+            'open': data['Open'],
+            'high': data['High'],
+            'low': data['Low'],
+            'close': data['Close'],
+            'volume': data['Volume']
+        })
+        df = df[df['volume'] != 0]
+        df.reset_index(drop=True, inplace=True)
+
+        # Calculate channel lines outside the function
+        highs, lows = df['high'].rolling(window=int(len(df) * 0.05), min_periods=1).max(), df['low'].rolling(
+            window=int(len(df) * 0.05), min_periods=1).min()
+        swing_high_indices, swing_low_indices = highs.dropna().index, lows.dropna().index
+        support, resistance = np.polyfit(swing_low_indices, lows.dropna(), 1), np.polyfit(swing_high_indices,
+                                                                                        highs.dropna(), 1)
+
+        # Plot candlestick chart
+        fig, ax = plt.subplots(figsize=(10, 6))
+
+        current_price = df['close'].iloc[-1]
+        support_price = support[1]  
+        resistance_price = resistance[1]  
+
+        info_text = f'Current Value: {current_price:.2f}\nSupport: {support_price:.2f}\nResistance: {resistance_price:.2f}'
+        bbox_props = dict(boxstyle="round,pad=0.3", edgecolor="black", facecolor="white", alpha=0.7)
+        ax.text(df['time'].iloc[0], df['high'].max(), info_text, fontsize=10, verticalalignment='top', bbox=bbox_props)
+
+        ax.plot(df['time'], df['open'], linestyle='-', color='black')
+        ax.plot(df['time'], df['close'], linestyle='-', color='black')
+        ax.vlines(df['time'], df['low'], df['high'], color='black', linewidth=1)
+        ax.legend()
+
+        # Plot support and resistance lines
+        num_future_days = 120
+        last_date = pd.to_datetime(df['time'].iloc[-1])
+        future_dates = [last_date + timedelta(days=i) for i in range(1, num_future_days + 1)]
+        support_line_future = support[0] * np.arange(len(df), len(df) + num_future_days) + support[1]
+        resistance_line_future = resistance[0] * np.arange(len(df), len(df) + num_future_days) + resistance[1]
+
+        ax.plot(future_dates, support_line_future, linestyle='--', color='green')
+        ax.plot(future_dates, resistance_line_future, linestyle='--', color='orange')
+        ax.plot(df['time'], support[0] * np.arange(len(df)) + support[1], linestyle='-', color='green')
+        ax.plot(df['time'], resistance[0] * np.arange(len(df)) + resistance[1], linestyle='-', color='orange')
+
+        # Set labels and title
+        ax.set_xlabel("Date")
+        ax.set_ylabel("Price")
+        # ax.set_title(symbol)
+        ax.legend()
+
+        # Save the figure to a file
+        image_path = os.path.join('static', 'images', f'{index}_{symbol}.png')
+        plt.savefig(image_path)
+        plt.close()
+    except Exception as e:
+        print(f"Failed download for {symbol}: {e}")
+        df_nifty100 = df_nifty100[df_nifty100['Symbol'] != symbol]
+
+def generate_all_graphs():
+    for idx, row in df_nifty100.iterrows():
+        symbol = row['Symbol'] + ".NS"
+        generate_graph(symbol, idx + 1)
+
+def before_run():
+    generate_graph("^NSEI", 0)
+    generate_all_graphs()
+
+before_run()
 
 nifty50_data = read_csv_and_preprocess("nifty50list.csv")
 nifty50_df, nifty50_stocks_not_fetched = get_data_for_endpoints(nifty50_data)
@@ -122,66 +202,13 @@ def display_nifty100_table():
 
 @app.route('/chart')
 def display_candlestick_chart():
-    symbol = "^NSEI"
-    end_date = datetime.now().strftime("%Y-%m-%d")
-    start_date = (datetime.now() - timedelta(days=5*365)).strftime("%Y-%m-%d")
-    data = yf.download(symbol, start=start_date, end=end_date)
-    data.reset_index(inplace=True)
-    df = pd.DataFrame({
-        'time': data['Date'],
-        'open': data['Open'],
-        'high': data['High'],
-        'low': data['Low'],
-        'close': data['Close'],
-        'volume': data['Volume']
-    })
-    df = df[df['volume'] != 0]
-    df.reset_index(drop=True, inplace=True)
+    symbols = ['0_' + '^NSEI']
+    
+    for idx, row in df_nifty100.iterrows():
+        symbol = f"{idx + 1}_{row['Symbol']}.NS"
+        symbols.append(symbol)
 
-    num_trading_days = len(df)
-    window = int(num_trading_days * 0.05)
-
-    fig = go.Figure(data=[go.Candlestick(x=df['time'],
-                open=df['open'],
-                high=df['high'],
-                low=df['low'],
-                close=df['close'])])
-
-    def calculate_ascending_channel_lines(data, window):
-        highs = data['high'].rolling(window=window, min_periods=1).max()
-        lows = data['low'].rolling(window=window, min_periods=1).min()
-        return highs, lows
-
-    highs, lows = calculate_ascending_channel_lines(df, window)
-    swing_high_indices = highs.dropna().index
-    swing_low_indices = lows.dropna().index
-    slmax, intercmax = np.polyfit(swing_high_indices, highs.dropna(), 1)
-    slmin, intercmin = np.polyfit(swing_low_indices, lows.dropna(), 1)
-
-    num_future_days = 120
-    last_date = pd.to_datetime(df['time'].iloc[-1])
-    future_dates = [last_date + timedelta(days=i) for i in range(1, num_future_days+1)]
-    upper_channel_line_future = slmax * np.arange(num_trading_days, num_trading_days + num_future_days) + intercmax
-    lower_channel_line_future = slmin * np.arange(num_trading_days, num_trading_days + num_future_days) + intercmin
-
-    fig.add_trace(go.Scatter(x=future_dates, y=lower_channel_line_future, mode='lines', line=dict(color='red', dash='dash'), name='Lower Channel Line (Future)'))
-    fig.add_trace(go.Scatter(x=future_dates, y=upper_channel_line_future, mode='lines', line=dict(color='blue', dash='dash'), name='Upper Channel Line (Future)'))
-    fig.add_trace(go.Scatter(x=df['time'], y=slmin*np.arange(num_trading_days) + intercmin, mode='lines', line=dict(color='red'), name='Lower Channel Line'))
-    fig.add_trace(go.Scatter(x=df['time'], y=slmax*np.arange(num_trading_days) + intercmax, mode='lines', line=dict(color='blue'), name='Upper Channel Line'))
-
-    fig.update_layout(
-        xaxis_title="Date",
-        yaxis_title="Price",
-        margin=dict(l=50, r=50, t=50, b=50),
-        autosize=True, 
-        # height=800, 
-    )
-
-    chart_div = fig.to_html(full_html=False, include_plotlyjs='cdn')
-    response = app.make_response(render_template('chart.html', chart_div=chart_div))
-    response.headers['Content-Type'] = 'text/html; charset=utf-8'
-
-    return response
+    return render_template('chart.html', symbols=symbols, today_date=today_date)
 
 if __name__ == '__main__':
     freezer = Freezer(app)
