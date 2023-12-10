@@ -63,6 +63,23 @@
             max-width: 45%;
             margin: 10px; 
         }  
+        .fullscreen-image {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .fullscreen-image img {
+            max-width: 90%;
+            max-height: 90%;
+        }
     </style>
 </head>
 
@@ -79,19 +96,23 @@
      
 
     <h2>Nifty50 Index <small class="text-muted">Trend Channels</small></h2>
-
+    <h2><small class="text-muted">Click on chart to zoom in</small></h2>
     <br><br>
+
+    <div class="container-fluid mt-4 text-monospace">
+        <h4>
+            Nifty 100 Trend Channels:
+            <small class="text-muted">Click on any chart to zoom in</small>
+        </h4>
+        <br><br>
 
     <div class="row">
         {% for symbol in symbols %}
-            <div class="col-lg-6 mb-4"> <!-- Use col-lg-6 to show two boxes in one row on large screens -->
+            <div class="col-lg-6 mb-4">
                 <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ symbol }}</h5>
+                    <div class="card-body text-center">
+                        <h5 class="card-title font-weight-bold" style="color: rgb(62, 61, 60); font-size: 1.5rem;">{{ symbol }}</h5>
                         <img src="{{ url_for('static', filename='images/' + symbol + '.png') }}" alt="{{ symbol }}" class="img-fluid">
-                        <button type="button" class="btn btn-primary mt-2" onclick="openFullscreen(this.parentElement.parentElement)">
-                            Zoom
-                        </button>
                     </div>
                 </div>
             </div>
@@ -100,9 +121,32 @@
     <br><br>
     <br><br>
 
-    
-    <br><br>
-    <br><br>
+    <div class="fullscreen-image" id="fullscreenImage">
+        <img src="" alt="Full Screen Image" id="fullscreenImageSrc">
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get all images with the class 'img-fluid'
+            var images = document.querySelectorAll('.img-fluid');
+
+            // Add click event listener to each image
+            images.forEach(function (image) {
+                image.addEventListener('click', function () {
+                    // Set the source of the fullscreen image
+                    document.getElementById('fullscreenImageSrc').src = this.src;
+
+                    // Show the fullscreen image
+                    document.getElementById('fullscreenImage').style.display = 'flex';
+                });
+            });
+
+            // Add click event listener to close the fullscreen image
+            document.getElementById('fullscreenImage').addEventListener('click', function () {
+                this.style.display = 'none';
+            });
+        });
+    </script>    
     <div class="card-footer text-muted"></div>
     </div>
     </div>

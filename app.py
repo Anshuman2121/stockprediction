@@ -94,7 +94,7 @@ def get_data_for_endpoints(data):
 
     return pd.DataFrame(data_list, columns=['Name', 'Industry', 'Symbol', 'Current Price', '200 DMA Avg', '1Y High % Diff', '2Y High % Diff', '5Y High % Diff', '1Y Low % Diff', '2Y Low % Diff', '5Y Low % Diff']), stocks_not_fetched
 
-def generate_graph(symbol, index):
+def generate_graph(symbol):
     try:
         end_date = datetime.now().strftime("%Y-%m-%d")
         start_date = (datetime.now() - timedelta(days=5 * 365)).strftime("%Y-%m-%d")
@@ -155,7 +155,7 @@ def generate_graph(symbol, index):
         ax.legend()
 
         # Save the figure to a file
-        image_path = os.path.join('static', 'images', f'{index}_{symbol}.png')
+        image_path = os.path.join('static', 'images', f'{symbol}.png')
         plt.savefig(image_path)
         plt.close()
     except Exception as e:
@@ -165,10 +165,10 @@ def generate_graph(symbol, index):
 def generate_all_graphs():
     for idx, row in df_nifty100.iterrows():
         symbol = row['Symbol'] + ".NS"
-        generate_graph(symbol, idx + 1)
+        generate_graph(symbol)
 
 def before_run():
-    generate_graph("^NSEI", 0)
+    generate_graph("^NSEI")
     generate_all_graphs()
 
 before_run()
@@ -202,10 +202,10 @@ def display_nifty100_table():
 
 @app.route('/chart')
 def display_candlestick_chart():
-    symbols = ['0_' + '^NSEI']
+    symbols = ['^NSEI']
     
     for idx, row in df_nifty100.iterrows():
-        symbol = f"{idx + 1}_{row['Symbol']}.NS"
+        symbol = f"{row['Symbol']}.NS"
         symbols.append(symbol)
 
     return render_template('chart.html', symbols=symbols, today_date=today_date)
