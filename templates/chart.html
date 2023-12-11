@@ -102,12 +102,13 @@
         <br><br>
 
     <div class="row">
-        {% for symbol in symbols %}
+        {% for data in symbols_data %}
             <div class="col-lg-6 mb-4">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h5 class="card-title font-weight-bold" style="color: rgb(62, 61, 60); font-size: 1.5rem;">{{ symbol }}</h5>
-                        <img src="{{ url_for('static', filename='images/' + symbol + '.png') }}" alt="{{ symbol }}" class="img-fluid">
+                        <h5 class="card-title font-weight-bold" style="color: rgb(62, 61, 60); font-size: 1.5rem;">{{ data['name'] }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ data['industry'] }}</h6>
+                        <img src="{{ url_for('static', filename='images/' + data['symbol'] + '.png') }}" alt="{{ data['symbol'] }}" class="img-fluid">
                     </div>
                 </div>
             </div>
