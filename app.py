@@ -94,81 +94,110 @@ def get_data_for_endpoints(data):
 
     return pd.DataFrame(data_list, columns=['Name', 'Industry', 'Symbol', 'Current Price', '200 DMA Avg', '1Y High % Diff', '2Y High % Diff', '5Y High % Diff', '1Y Low % Diff', '2Y Low % Diff', '5Y Low % Diff']), stocks_not_fetched
 
+def get_financial_data(symbol):
+    try:
+        stock_info = yf.Ticker(symbol)
+        eps = stock_info.info.get('trailingEps', 'N/A')
+        pe_ratio = stock_info.info.get('trailingPE', 'N/A')
+        revenue = stock_info.info.get('totalRevenue', 'N/A')
+        analyst_recommendation_mean = stock_info.info.get('recommendationMean', 'N/A')
+        analyst_recommendation_key = stock_info.info.get('recommendationKey', 'N/A')
+        return eps, pe_ratio, revenue, analyst_recommendation_mean, analyst_recommendation_key
+    except Exception as e:
+        print(f"Failed to fetch financial data for {symbol}: {e}")
+        return 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'
+
+
+def process_data_and_plot_chart(symbol, info_text_enabled=True):
+    end_date = datetime.now().strftime("%Y-%m-%d")
+    start_date = (datetime.now() - timedelta(days=5 * 365)).strftime("%Y-%m-%d")
+    data = yf.download(symbol, start=start_date, end=end_date)
+    data.reset_index(inplace=True)
+
+    # Create DataFrame
+    df = pd.DataFrame({
+        'time': data['Date'],
+        'open': data['Open'],
+        'high': data['High'],
+        'low': data['Low'],
+        'close': data['Close'],
+        'volume': data['Volume']
+    })
+    df = df[df['volume'] != 0]
+    df.reset_index(drop=True, inplace=True)
+
+    # Calculate channel lines outside the function
+    highs, lows = df['high'].rolling(window=int(len(df) * 0.05), min_periods=1).max(), df['low'].rolling(
+        window=int(len(df) * 0.05), min_periods=1).min()
+    swing_high_indices, swing_low_indices = highs.dropna().index, lows.dropna().index
+    support, resistance = np.polyfit(swing_low_indices, lows.dropna(), 1), np.polyfit(swing_high_indices,
+                                                                                    highs.dropna(), 1)
+
+    # Plot candlestick chart
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    ax.plot(df['time'], df['open'], linestyle='-', color='black')
+    ax.plot(df['time'], df['close'], linestyle='-', color='black')
+    ax.vlines(df['time'], df['low'], df['high'], color='black', linewidth=1)
+    ax.legend()
+
+    # Plot support and resistance lines
+    num_future_days = 120
+    last_date = pd.to_datetime(df['time'].iloc[-1])
+    future_dates = [last_date + timedelta(days=i) for i in range(1, num_future_days + 1)]
+    support_line_future = support[0] * np.arange(len(df), len(df) + num_future_days) + support[1]
+    resistance_line_future = resistance[0] * np.arange(len(df), len(df) + num_future_days) + resistance[1]
+
+    ax.plot(future_dates, support_line_future, linestyle='--', color='green')
+    ax.plot(future_dates, resistance_line_future, linestyle='--', color='orange')
+    ax.plot(df['time'], support[0] * np.arange(len(df)) + support[1], linestyle='-', color='green')
+    ax.plot(df['time'], resistance[0] * np.arange(len(df)) + resistance[1], linestyle='-', color='orange')
+
+    if info_text_enabled:
+        current_price = df['close'].iloc[-1]
+        eps, pe_ratio, revenue, analyst_recommendation_mean, analyst_recommendation_key = get_financial_data(symbol)
+
+        # Convert revenue to crores
+        revenue_in_crores = revenue / 1e7
+
+        info_text = f'Current Value: {current_price:.2f}\n' \
+                    f'P/E Ratio: {pe_ratio}\n' \
+                    f'Revenue: ₹{revenue_in_crores:.2f} Crores\n' \
+                    f'Analyst Recommendation Mean: {analyst_recommendation_mean}\n' \
+                    f'Analyst Recommendation: {analyst_recommendation_key}'
+
+        bbox_props = dict(boxstyle="round,pad=0.3", edgecolor="black", facecolor="white", alpha=0.7)
+        ax.text(0.02, 0.98, info_text, transform=ax.transAxes, fontsize=10, verticalalignment='top', bbox=bbox_props)
+
+    # Set labels and title
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Price")
+    # ax.set_title(symbol)
+    ax.legend()
+
+    # Save the figure to a file
+    image_path = os.path.join('static', 'images', f'{symbol}.png')
+    plt.savefig(image_path)
+    plt.close()
+
+
 def generate_graph(symbol):
     try:
-        end_date = datetime.now().strftime("%Y-%m-%d")
-        start_date = (datetime.now() - timedelta(days=5 * 365)).strftime("%Y-%m-%d")
-        data = yf.download(symbol, start=start_date, end=end_date)
-        data.reset_index(inplace=True)
-
-        # Create DataFrame
-        df = pd.DataFrame({
-            'time': data['Date'],
-            'open': data['Open'],
-            'high': data['High'],
-            'low': data['Low'],
-            'close': data['Close'],
-            'volume': data['Volume']
-        })
-        df = df[df['volume'] != 0]
-        df.reset_index(drop=True, inplace=True)
-
-        # Calculate channel lines outside the function
-        highs, lows = df['high'].rolling(window=int(len(df) * 0.05), min_periods=1).max(), df['low'].rolling(
-            window=int(len(df) * 0.05), min_periods=1).min()
-        swing_high_indices, swing_low_indices = highs.dropna().index, lows.dropna().index
-        support, resistance = np.polyfit(swing_low_indices, lows.dropna(), 1), np.polyfit(swing_high_indices,
-                                                                                        highs.dropna(), 1)
-
-        # Plot candlestick chart
-        fig, ax = plt.subplots(figsize=(10, 6))
-
-        current_price = df['close'].iloc[-1]
-        support_price = support[1]  
-        resistance_price = resistance[1]  
-
-        info_text = f'Current Value: {current_price:.2f}\nSupport: {support_price:.2f}\nResistance: {resistance_price:.2f}'
-        bbox_props = dict(boxstyle="round,pad=0.3", edgecolor="black", facecolor="white", alpha=0.7)
-        ax.text(df['time'].iloc[0], df['high'].max(), info_text, fontsize=10, verticalalignment='top', bbox=bbox_props)
-
-        ax.plot(df['time'], df['open'], linestyle='-', color='black')
-        ax.plot(df['time'], df['close'], linestyle='-', color='black')
-        ax.vlines(df['time'], df['low'], df['high'], color='black', linewidth=1)
-        ax.legend()
-
-        # Plot support and resistance lines
-        num_future_days = 120
-        last_date = pd.to_datetime(df['time'].iloc[-1])
-        future_dates = [last_date + timedelta(days=i) for i in range(1, num_future_days + 1)]
-        support_line_future = support[0] * np.arange(len(df), len(df) + num_future_days) + support[1]
-        resistance_line_future = resistance[0] * np.arange(len(df), len(df) + num_future_days) + resistance[1]
-
-        ax.plot(future_dates, support_line_future, linestyle='--', color='green')
-        ax.plot(future_dates, resistance_line_future, linestyle='--', color='orange')
-        ax.plot(df['time'], support[0] * np.arange(len(df)) + support[1], linestyle='-', color='green')
-        ax.plot(df['time'], resistance[0] * np.arange(len(df)) + resistance[1], linestyle='-', color='orange')
-
-        # Set labels and title
-        ax.set_xlabel("Date")
-        ax.set_ylabel("Price")
-        # ax.set_title(symbol)
-        ax.legend()
-
-        # Save the figure to a file
-        image_path = os.path.join('static', 'images', f'{symbol}.png')
-        plt.savefig(image_path)
-        plt.close()
+        if symbol != '^NSEI':
+            process_data_and_plot_chart(symbol)
+        else:
+            # Symbol is ^NSEI, do not call get_financial_data and do not generate info_text
+            process_data_and_plot_chart(symbol, info_text_enabled=False)
     except Exception as e:
         print(f"Failed download for {symbol}: {e}")
         df_nifty100 = df_nifty100[df_nifty100['Symbol'] != symbol]
 
 def generate_all_graphs():
     for idx, row in df_nifty100.iterrows():
-        symbol = row['Symbol'] + ".NS"
+        symbol = row['Symbol']
         generate_graph(symbol)
 
 def before_run():
-    generate_graph("^NSEI")
     generate_all_graphs()
 
 before_run()
@@ -202,13 +231,17 @@ def display_nifty100_table():
 
 @app.route('/chart')
 def display_candlestick_chart():
-    symbols = ['^NSEI']
-    
+    symbols_data = []
     for idx, row in df_nifty100.iterrows():
-        symbol = f"{row['Symbol']}.NS"
-        symbols.append(symbol)
+        symbol_data = {
+            'symbol': row['Symbol'],
+            'name': row['Name'],
+            'industry': row['Industry']
+        }
+        symbols_data.append(symbol_data)
 
-    return render_template('chart.html', symbols=symbols, today_date=today_date)
+    return render_template('chart.html', symbols_data=symbols_data, today_date=today_date)
+
 
 if __name__ == '__main__':
     freezer = Freezer(app)
