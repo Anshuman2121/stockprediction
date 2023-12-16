@@ -99,13 +99,14 @@ def get_financial_data(symbol):
         stock_info = yf.Ticker(symbol)
         eps = stock_info.info.get('trailingEps', 'N/A')
         pe_ratio = stock_info.info.get('trailingPE', 'N/A')
+        book_value = stock_info.info.get('bookValue', 'N/A')  # Add this line for Book Value
         revenue = stock_info.info.get('totalRevenue', 'N/A')
         analyst_recommendation_mean = stock_info.info.get('recommendationMean', 'N/A')
         analyst_recommendation_key = stock_info.info.get('recommendationKey', 'N/A')
-        return eps, pe_ratio, revenue, analyst_recommendation_mean, analyst_recommendation_key
+        return eps, pe_ratio, revenue, analyst_recommendation_mean, analyst_recommendation_key, book_value
     except Exception as e:
         print(f"Failed to fetch financial data for {symbol}: {e}")
-        return 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'
+        return 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'
 
 
 def process_data_and_plot_chart(symbol, info_text_enabled=True):
@@ -136,9 +137,9 @@ def process_data_and_plot_chart(symbol, info_text_enabled=True):
     # Plot candlestick chart
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    ax.plot(df['time'], df['open'], linestyle='-', color='black')
-    ax.plot(df['time'], df['close'], linestyle='-', color='black')
-    ax.vlines(df['time'], df['low'], df['high'], color='black', linewidth=1)
+    ax.plot(df['time'], df['open'], linestyle='-', color='#663300')
+    ax.plot(df['time'], df['close'], linestyle='-', color='#663300')
+    ax.vlines(df['time'], df['low'], df['high'], color='#663300', linewidth=.1)
     ax.legend()
 
     # Plot support and resistance lines
@@ -155,19 +156,20 @@ def process_data_and_plot_chart(symbol, info_text_enabled=True):
 
     if info_text_enabled:
         current_price = df['close'].iloc[-1]
-        eps, pe_ratio, revenue, analyst_recommendation_mean, analyst_recommendation_key = get_financial_data(symbol)
+        eps, pe_ratio, revenue, analyst_recommendation_mean, analyst_recommendation_key, book_value = get_financial_data(symbol)
 
         # Convert revenue to crores
         revenue_in_crores = revenue / 1e7
 
         info_text = f'Current Value: {current_price:.2f}\n' \
-                    f'P/E Ratio: {pe_ratio}\n' \
-                    f'Revenue: ₹{revenue_in_crores:.2f} Crores\n' \
-                    f'Analyst Recommendation Mean: {analyst_recommendation_mean}\n' \
-                    f'Analyst Recommendation: {analyst_recommendation_key}'
+            f'P/E Ratio: {pe_ratio}\n' \
+            f'Book Value: {book_value}\n' \
+            f'EPS: {eps}\n' \
+            f'Advice|Mean: {analyst_recommendation_key}|{analyst_recommendation_mean}'
 
-        bbox_props = dict(boxstyle="round,pad=0.3", edgecolor="black", facecolor="white", alpha=0.7)
-        ax.text(0.02, 0.98, info_text, transform=ax.transAxes, fontsize=10, verticalalignment='top', bbox=bbox_props)
+        bbox_props = dict(boxstyle="round,pad=0.3", edgecolor="black", facecolor="#ffe6e6", alpha=0.7)
+        ax.text(0.02, 0.98, info_text, transform=ax.transAxes, fontsize=10, verticalalignment='top', bbox=bbox_props,
+                fontfamily='sans-serif', color='#002699')
 
     # Set labels and title
     ax.set_xlabel("Date")

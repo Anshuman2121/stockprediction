@@ -1,5 +1,25 @@
 Symbol,Industry,Name,Revenue
 ^NSEI,Index,Nifty 50 Index,0
+HDFCBANK.NS,Banks - Regional,HDFC Bank Limited,1565269164032
+SWSOLAR.NS,Construction and Materials,Sterling and Wilson Renewable Energy Ltd,0
+SBIN.NS,Banks - Regional,State Bank of India,2841435439104
+KOTAKBANK.NS,Banks - Regional,Kotak Mahindra Bank Limited,616834138112
+PIDILITIND.NS,Specialty Chemicals,Pidilite Industries Limited,120379899904
+PAGEIND.NS,Personal Goods,Page Industries Ltd,0
+DMART.NS,Discount Stores,Avenue Supermarts Limited,466529714176
+SBICARD.NS,Credit Services,SBI Cards and Payment Services Limited,105058000896
+HINDUNILVR.NS,Household & Personal Products,Hindustan Unilever Limited,619310022656
+ASIANPAINT.NS,Specialty Chemicals,Asian Paints Limited,350244601856
+PIIND.NS,Agricultural Inputs,PI Industries Limited,72061001728
+MANYAVAR.NS,Personal Goods,Vedant Fashions Ltd,0
+BANKBARODA.NS,Banks - Regional,Bank of Baroda Limited,576629309440
+BAJFINANCE.NS,Credit Services,Bajaj Finance Limited,287215910912
+AAVAS.NS,Finance and Credit Services,Aavas Financiers Ltd,0
+PNB.NS,Banks - Regional,Punjab National Bank,344348590080
+JYOTIRES.NS,Adhesives Ltd,JYOTIRES fundamentals,0
+INDIGOPNTS.NS,General Industrials,Indigo Paints Ltd,0
+YESBANK.NS,Banks,Yes Bank Ltd,0
+JIOFIN.NS,Oil, Gas and Coal,Jio Financial Services Ltd,0
 RELIANCE.NS,Oil & Gas Refining & Marketing,Reliance Industries Limited,8690160107520
 LICI.NS,Insurance - Life,Life Insurance Corporation of India,7973763022848
 IOC.NS,Oil & Gas Refining & Marketing,Indian Oil Corporation Limited,7873840545792
@@ -14,7 +34,6 @@ HINDALCO.NS,Aluminum,Hindalco Industries Limited,2161680056320
 LT.NS,Engineering & Construction,Larsen & Toubro Limited,2073299255296
 NTPC.NS,Utilities - Regulated Electric,NTPC Limited,1769131999232
 JSWSTEEL.NS,Steel,JSW Steel Limited,1728929988608
-HDFCBANK.NS,Banks - Regional,HDFC Bank Limited,1565269164032
 BHARTIARTL.NS,Telecom Services,Bharti Airtel Limited,1462972055552
 VEDL.NS,Other Industrial Metals & Mining,Vedanta Limited,1432870060032
 COALINDIA.NS,Thermal Coal,Coal India Limited,1412659937280
@@ -32,29 +51,22 @@ MOTHERSON.NS,Auto Parts,Samvardhana Motherson International Limited,881793630208
 ITC.NS,Tobacco,ITC Limited,702783422464
 ICICIPRULI.NS,Insurance - Life,ICICI Prudential Life Insurance Company Limited,691911262208
 ULTRACEMCO.NS,Building Materials,UltraTech Cement Limited,679325401088
-HINDUNILVR.NS,Household & Personal Products,Hindustan Unilever Limited,619310022656
-KOTAKBANK.NS,Banks - Regional,Kotak Mahindra Bank Limited,616834138112
 INDIGO.NS,Airlines,InterGlobe Aviation Limited,607204999168
 AXISBANK.NS,Banks - Regional,Axis Bank Limited,595522813952
-BANKBARODA.NS,Banks - Regional,Bank of Baroda Limited,576629309440
 TATAPOWER.NS,Utilities - Independent Power Producers,The Tata Power Company Limited,575341985792
 AWL.NS,Packaged Foods,Adani Wilmar Limited,545059209216
 TECHM.NS,Information Technology Services,Tech Mahindra Limited,534757015552
 CANBK.NS,Banks - Regional,Canara Bank,515287941120
 JINDALSTEL.NS,Steel,Jindal Steel & Power Limited,509828694016
 UPL.NS,Agricultural Inputs,UPL Limited,493809991680
-DMART.NS,Discount Stores,Avenue Supermarts Limited,466529714176
 TITAN.NS,Luxury Goods,Titan Company Limited,463949987840
 SUNPHARMA.NS,Drug Manufacturers - Specialty & Generic,Sun Pharmaceutical Industries Limited,463048900608
 POWERGRID.NS,Utilities - Regulated Electric,Power Grid Corporation of India Limited,458406985728
 BAJAJ-AUTO.NS,Auto Manufacturers,Bajaj Auto Limited,403337510912
 TVSMOTOR.NS,Auto Manufacturers,TVS Motor Company Limited,351587106816
-ASIANPAINT.NS,Specialty Chemicals,Asian Paints Limited,350244601856
 HEROMOTOCO.NS,Auto Manufacturers,Hero MotoCorp Limited,349366910976
 LTIM.NS,Information Technology Services,LTIMindtree Limited,349185015808
-PNB.NS,Banks - Regional,Punjab National Bank,344348590080
 AMBUJACEM.NS,Building Materials,Ambuja Cements Limited,320095715328
-BAJFINANCE.NS,Credit Services,Bajaj Finance Limited,287215910912
 HAL.NS,Aerospace & Defense,Hindustan Aeronautics Limited,277112586240
 DRREDDY.NS,Drug Manufacturers - Specialty & Generic,Dr. Reddy's Laboratories Limited,266854006784
 CIPLA.NS,Drug Manufacturers - General,Cipla Limited,243406995456
@@ -78,10 +90,8 @@ ADANIENSOL.NS,Utilities - Independent Power Producers,Adani Energy Solutions Lim
 GODREJCP.NS,Household & Personal Products,Godrej Consumer Products Limited,138499407872
 SRF.NS,Specialty Chemicals,SRF Limited,137634906112
 DABUR.NS,Household & Personal Products,Dabur India Limited,120552800256
-PIDILITIND.NS,Specialty Chemicals,Pidilite Industries Limited,120379899904
 BERGEPAINT.NS,Specialty Chemicals,Berger Paints India Limited,109341499392
 MCDOWELL-N.NS,Beverages - Wineries & Distilleries,United Spirits Limited,108166995968
-SBICARD.NS,Credit Services,SBI Cards and Payment Services Limited,105058000896
 TORNTPHARM.NS,Drug Manufacturers - Specialty & Generic,Torrent Pharmaceuticals Limited,102331498496
 ABB.NS,Specialty Industrial Machinery,ABB India Limited,101159403520
 TRENT.NS,Apparel Retail,Trent Limited,100969201664
@@ -91,7 +101,6 @@ ADANIGREEN.NS,Utilities - Renewable,Adani Green Energy Limited,89710002176
 MUTHOOTFIN.NS,Credit Services,Muthoot Finance Limited,82566397952
 DIVISLAB.NS,Drug Manufacturers - Specialty & Generic,Divi's Laboratories Limited,73456099328
 CHOLAFIN.NS,Credit Services,Cholamandalam Investment and Finance Company Limited,72839503872
-PIIND.NS,Agricultural Inputs,PI Industries Limited,72061001728
 DLF.NS,Real Estate - Development,DLF Limited,57217728512
 COLPAL.NS,Household & Personal Products,Colgate-Palmolive (India) Limited,54366670848
 ATGL.NS,Utilities - Regulated Gas,Adani Total Gas Limited,43721998336
