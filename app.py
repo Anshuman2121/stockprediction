@@ -257,7 +257,7 @@ def display_candlestick_chart():
 
 @app.route('/chartindex')
 def display_index_chart():
-   index_data = []
+    index_data = []
     for idx, row in df_index.iterrows():
         symbol_data = {
             'symbol': row['Symbol'],
