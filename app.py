@@ -257,16 +257,16 @@ def display_candlestick_chart():
 
 @app.route('/chartindex')
 def display_index_chart():
-    symbols_data = []
+    index_data = []
     for idx, row in df_index.iterrows():
         symbol_data = {
             'symbol': row['Symbol'],
             'name': row['Name'],
             'industry': row['Industry']
         }
-        symbols_data.append(symbol_data)
+        index_data.append(symbol_data)
 
-    return render_template('chartindex.html', symbols_data=symbols_data, today_date=today_date)
+    return render_template('chartindex.html', symbols_data=index_data, today_date=today_date)
 
 
 if __name__ == '__main__':

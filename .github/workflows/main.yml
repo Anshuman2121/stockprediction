@@ -40,6 +40,7 @@ jobs:
         mv build/midcap100 MarketInsights/midcap100.html
         mv build/niftynext50 MarketInsights/niftynext50.html
         sed -i '' 's,/static/images/,static/images/,g' build/chart
+        sed -i '' 's,/static/images/,static/images/,g' build/chartindex
         mv build/chart MarketInsights/chart.html
         mv build/chartindex MarketInsights/chartindex.html
         rm -rf MarketInsights/static/images/*
