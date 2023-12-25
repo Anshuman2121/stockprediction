@@ -10,6 +10,7 @@ import os
 
 app = Flask(__name__)
 df_nifty100 = pd.read_csv('nifty100list.csv')
+df_index = pd.read_csv('niftyindex.csv')
 
 def custom_strftime(date_object):
     suffix = 'th' if 11 <= date_object.day <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(date_object.day % 10, 'th')
@@ -194,10 +195,20 @@ def generate_graph(symbol):
         print(f"Failed download for {symbol}: {e}")
         df_nifty100 = df_nifty100[df_nifty100['Symbol'] != symbol]
 
+def generate_index_graph(symbol):
+    try:
+        process_data_and_plot_chart(symbol, info_text_enabled=False)
+    except Exception as e:
+        print(f"Failed download for {symbol}: {e}")
+        df_index = df_index[df_index['Symbol'] != symbol]
+
 def generate_all_graphs():
     for idx, row in df_nifty100.iterrows():
         symbol = row['Symbol']
         generate_graph(symbol)
+    for idx, row in df_index.iterrows():
+        symbol = row['Symbol']
+        generate_index_graph(symbol)
 
 def before_run():
     generate_all_graphs()
@@ -243,6 +254,19 @@ def display_candlestick_chart():
         symbols_data.append(symbol_data)
 
     return render_template('chart.html', symbols_data=symbols_data, today_date=today_date)
+
+@app.route('/chartindex')
+def display_candlestick_chart():
+    symbols_data = []
+    for idx, row in df_index.iterrows():
+        symbol_data = {
+            'symbol': row['Symbol'],
+            'name': row['Name'],
+            'industry': row['Industry']
+        }
+        symbols_data.append(symbol_data)
+
+    return render_template('chartindex.html', symbols_data=symbols_data, today_date=today_date)
 
 
 if __name__ == '__main__':
