@@ -181,13 +181,15 @@ def process_data_and_plot_chart(symbol, info_text_enabled=True):
     # ax_price.set_title(symbol)
     ax_price.legend()
 
-    if info_text_enabled:
-        eps = yf.Ticker(symbol).info['trailingEps'] 
-        pe_ratio = df['close'] / eps  
-        ax_pe_ratio.plot(df['time'], pe_ratio, linestyle='-', color='#d45087') 
-        ax_pe_ratio.set_ylabel("PE Ratio") 
+    try:
+        if info_text_enabled:
+            eps = yf.Ticker(symbol).info['trailingEps'] 
+            pe_ratio = df['close'] / eps  
+            ax_pe_ratio.plot(df['time'], pe_ratio, linestyle='-', color='#d45087') 
+            ax_pe_ratio.set_ylabel("PE Ratio") 
+    except:
+        print(f"PE chart not generated for {symbol}")
 
-    # Save the figure to a file
     image_path = os.path.join('static', 'images', f'{symbol}.png')
     plt.savefig(image_path)
     plt.close()
