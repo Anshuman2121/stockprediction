@@ -135,16 +135,13 @@ def process_data_and_plot_chart(symbol, info_text_enabled=True):
     support, resistance = np.polyfit(swing_low_indices, lows.dropna(), 1), np.polyfit(swing_high_indices,
                                                                                     highs.dropna(), 1)
 
-    if info_text_enabled:
-        fig, axs = plt.subplots(2, 1, figsize=(10, 9), gridspec_kw={'height_ratios': [3, 1]})
-        ax_price, ax_pe_ratio = axs
-    else:
-        fig, ax_price = plt.subplots(figsize=(10, 6))
+    # Plot candlestick chart
+    fig, ax = plt.subplots(figsize=(10, 6))
 
-    ax_price.plot(df['time'], df['open'], linestyle='-', color='#663300')
-    ax_price.plot(df['time'], df['close'], linestyle='-', color='#663300')
-    ax_price.vlines(df['time'], df['low'], df['high'], color='#663300', linewidth=.1)
-    ax_price.legend()
+    ax.plot(df['time'], df['open'], linestyle='-', color='#663300')
+    ax.plot(df['time'], df['close'], linestyle='-', color='#663300')
+    ax.vlines(df['time'], df['low'], df['high'], color='#663300', linewidth=.1)
+    ax.legend()
 
     # Plot support and resistance lines
     num_future_days = 120
@@ -153,10 +150,10 @@ def process_data_and_plot_chart(symbol, info_text_enabled=True):
     support_line_future = support[0] * np.arange(len(df), len(df) + num_future_days) + support[1]
     resistance_line_future = resistance[0] * np.arange(len(df), len(df) + num_future_days) + resistance[1]
 
-    ax_price.plot(future_dates, support_line_future, linestyle='--', color='green')
-    ax_price.plot(future_dates, resistance_line_future, linestyle='--', color='orange')
-    ax_price.plot(df['time'], support[0] * np.arange(len(df)) + support[1], linestyle='-', color='green')
-    ax_price.plot(df['time'], resistance[0] * np.arange(len(df)) + resistance[1], linestyle='-', color='orange')
+    ax.plot(future_dates, support_line_future, linestyle='--', color='green')
+    ax.plot(future_dates, resistance_line_future, linestyle='--', color='orange')
+    ax.plot(df['time'], support[0] * np.arange(len(df)) + support[1], linestyle='-', color='green')
+    ax.plot(df['time'], resistance[0] * np.arange(len(df)) + resistance[1], linestyle='-', color='orange')
 
     if info_text_enabled:
         current_price = df['close'].iloc[-1]
@@ -172,27 +169,20 @@ def process_data_and_plot_chart(symbol, info_text_enabled=True):
             f'Advice|Mean: {analyst_recommendation_key}|{analyst_recommendation_mean}'
 
         bbox_props = dict(boxstyle="round,pad=0.3", edgecolor="black", facecolor="#ffe6e6", alpha=0.7)
-        ax_price.text(0.02, 0.98, info_text, transform=ax_price.transAxes, fontsize=10, verticalalignment='top', bbox=bbox_props,
+        ax.text(0.02, 0.98, info_text, transform=ax.transAxes, fontsize=10, verticalalignment='top', bbox=bbox_props,
                 fontfamily='sans-serif', color='#002699')
 
     # Set labels and title
-    ax_price.set_xlabel("Date")
-    ax_price.set_ylabel("Price")
-    # ax_price.set_title(symbol)
-    ax_price.legend()
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Price")
+    # ax.set_title(symbol)
+    ax.legend()
 
-    try:
-        if info_text_enabled:
-            eps = yf.Ticker(symbol).info['trailingEps'] 
-            pe_ratio = df['close'] / eps  
-            ax_pe_ratio.plot(df['time'], pe_ratio, linestyle='-', color='#d45087') 
-            ax_pe_ratio.set_ylabel("PE Ratio") 
-    except:
-        print(f"PE chart not generated for {symbol}")
-
+    # Save the figure to a file
     image_path = os.path.join('static', 'images', f'{symbol}.png')
     plt.savefig(image_path)
     plt.close()
+
 
 def generate_graph(symbol):
     try:
